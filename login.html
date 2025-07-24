@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Pradiksha Restro Soft</title>
+  <!-- Firebase v8 Scripts -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <style>
+    body {
+      font-family: Arial;
+      background: #fff0e6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+    .login-box {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px gray;
+      width: 300px;
+      text-align: center;
+    }
+    input {
+      width: 100%;
+      margin: 10px 0;
+      padding: 10px;
+      font-size: 16px;
+    }
+    button {
+      background: #d35400;
+      color: white;
+      padding: 10px;
+      font-size: 16px;
+      border: none;
+      width: 100%;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #error {
+      color: red;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-box">
+    <h2>🔐 Pradiksha Restro Soft Login</h2>
+    <input type="email" id="email" placeholder="Email" />
+    <input type="password" id="password" placeholder="Password" />
+    <button onclick="loginUser()">Login</button>
+    <div id="error"></div>
+  </div>
+
+  <script>
+    // 🔧 Firebase Config
+    var firebaseConfig = {
+      apiKey: "AIzaSyAhF-4kKOhQ9tLEydd2PZaOcGAZ2o-KulM",
+  authDomain: "panchabyanjanbill.firebaseapp.com",
+  databaseURL: "https://panchabyanjanbill-default-rtdb.asia-southeast1.firebasedatabase.app", // ✅ Add this
+  projectId: "panchabyanjanbill",
+  storageBucket: "panchabyanjanbill.firebasestorage.app",
+  messagingSenderId: "829171785169",
+  appId: "1:829171785169:web:6e4af32472abf8b92b94f0"
+    };
+    firebase.initializeApp(firebaseConfig);
+
+    const auth = firebase.auth();
+    const db = firebase.database();
+
+    function loginUser() {
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+
+      auth.signInWithEmailAndPassword(email, password)
+        .then(userCredential => {
+          const uid = userCredential.user.uid;
+
+          // ✅ Check role
+          db.ref("userRoles/" + uid).once("value").then(snap => {
+            if (snap.exists()) {
+              const role = snap.val().role;
+              sessionStorage.setItem("role", role);
+              window.location.href = "index.html";
+            } else {
+              showError("❌ Role not assigned. Contact admin.");
+            }
+          });
+        })
+        .catch(error => {
+          console.error(error.message);
+          showError("❌ " + error.message);
+        });
+    }
+
+    function showError(msg) {
+      document.getElementById("error").innerText = msg;
+    }
+  </script>
+</body>
+</html>
