@@ -351,7 +351,7 @@ const menu = {
       "Egg Chicken Fried Rice+2pcs Chilli Chicken": 150
 };
 
-const billItems = [];
+let billItems = [];
 
 function filterMenu() {
   const search = document.getElementById("menuSearch").value.toLowerCase();
@@ -388,13 +388,15 @@ function renderBill() {
   const tbody = document.querySelector("#billTable tbody");
   tbody.innerHTML = "";
 
-  const printBody = document.getElementById("printTableBody"); // static tbody for printing
+  const printBody = document.getElementById("printTableBody");
   if (printBody) printBody.innerHTML = "";
 
   let subtotal = 0;
 
   billItems.forEach(({ name, qty, rate }, index) => {
-    const total = qty * rate;
+    const qtySafe = isNaN(qty) ? 1 : qty;
+    const rateSafe = isNaN(rate) ? 0 : rate;
+    const total = qtySafe * rateSafe;
     subtotal += total;
 
     // Editable version
@@ -402,21 +404,22 @@ function renderBill() {
       <tr>
         <td>${name}</td>
         <td>
-          <input type="number" value="${qty}" min="1" style="width: 50px;" 
+          <input type="number" value="${qtySafe}" min="1" style="width: 50px;" 
                  onchange="updateItemQty(${index}, this.value)" />
         </td>
-        <td>${rate}</td>
+        <td>${rateSafe}</td>
         <td>${total.toFixed(2)}</td>
         <td><button onclick="removeItem(${index})">❌</button></td>
       </tr>
     `;
-    // Static version for print
+
+    // Print version
     if (printBody) {
       printBody.innerHTML += `
         <tr>
           <td>${name}</td>
-          <td>${qty}</td>
-          <td>${rate}</td>
+          <td>${qtySafe}</td>
+          <td>${rateSafe}</td>
           <td>${total.toFixed(2)}</td>
         </tr>
       `;
@@ -431,14 +434,16 @@ function renderBill() {
   document.getElementById("taxAmount").innerText = taxAmt.toFixed(2);
   document.getElementById("grandTotal").innerText = total.toFixed(2);
 
-  // Also update print totals if needed
-  const printSubtotal = document.getElementById("printSubtotal");
-  const printTax = document.getElementById("printTax");
-  const printTotal = document.getElementById("printTotal");
-  if (printSubtotal) printSubtotal.innerText = subtotal.toFixed(2);
-  if (printTax) printTax.innerText = taxAmt.toFixed(2);
-  if (printTotal) printTotal.innerText = total.toFixed(2);
+  if (printBody) {
+    const printSubtotal = document.getElementById("printSubtotal");
+    const printTax = document.getElementById("printTax");
+    const printTotal = document.getElementById("printTotal");
+    if (printSubtotal) printSubtotal.innerText = subtotal.toFixed(2);
+    if (printTax) printTax.innerText = taxAmt.toFixed(2);
+    if (printTotal) printTotal.innerText = total.toFixed(2);
+  }
 }
+
 function updateItemQty(index, newQty) {
   const qty = parseInt(newQty);
   if (!qty || qty < 1) return;
@@ -473,11 +478,15 @@ function generateBill() {
 function saveAndStoreBill(billNo, name, mobile) {
   const tax = parseFloat(document.getElementById("tax").value) || 0;
   let subtotal = 0;
-  const items = billItems.map(i => {
-    const total = i.qty * i.rate;
-    subtotal += total;
-    return `${i.name} (x${i.qty}) = ₹${total}`;
-  });
+
+  const items = billItems
+    .filter(i => !isNaN(i.qty) && i.qty > 0 && !isNaN(i.rate))
+    .map(i => {
+      const total = i.qty * i.rate;
+      subtotal += total;
+      return `${i.name} (x${i.qty}) = ₹${total.toFixed(2)}`;
+    });
+
   const taxAmt = subtotal * tax / 100;
   const grandTotal = subtotal + taxAmt;
 
@@ -496,6 +505,7 @@ function saveAndStoreBill(billNo, name, mobile) {
   const history = JSON.parse(localStorage.getItem("billHistory") || "[]");
   history.push(bill);
   localStorage.setItem("billHistory", JSON.stringify(history));
+
   db.ref("bills").push(bill);
   generateKOT(billNo, items);
   showSettlementTab(); 
@@ -539,7 +549,46 @@ function generateKOT(billNo, items) {
     win.print();
   });
 }
+function generateUpdatedKOT(billNo, items) {
+  const kotId = "KOT" + Date.now();
 
+  db.ref("lastKOTNo").transaction(curr => (curr || 2000) + 1).then(res => {
+    const kotNo = res.snapshot.val();
+    const kot = {
+      kotId,
+      kotNo,
+      billNo,
+      items,
+      createdAt: new Date().toISOString(),
+      updated: true  // ✅ flag for reporting
+    };
+
+    db.ref("kots").push(kot);
+
+    const itemLines = items.map(i => {
+      const match = i.match(/^(.*?) \(x(\d+)\)/);
+      return match ? `• ${match[1]}  x${match[2]}` : `• ${i}`;
+    });
+
+    const kotText = `
+      <div style="width: 203px; font-size: 10px; font-family: monospace;">
+        <h3 style="text-align:center;">Panchabyanjan Restaurant and Caterer</h3>
+        <h3 style="text-align:center;">UPDATE OF BILL NO: ${billNo}</h3>
+        <p>KOT No: ${kotNo}</p>
+        <hr />
+        <pre>${itemLines.join("\n")}</pre>
+        <hr />
+        <p style="text-align:center;">Updated Kitchen Copy</p>
+      </div>
+    `;
+
+    const win = window.open("", "_blank");
+    win.document.write(kotText);
+    win.document.close();
+    win.focus();
+    win.print();
+  });
+}
 function printAndReset() {
   window.onafterprint = () => {
     billItems.length = 0;
@@ -648,14 +697,18 @@ function saveEditedBill() {
   };
 
   db.ref("bills/" + editingBillKey).set(bill, err => {
-    if (err) alert("Failed to save changes.");
-    else {
-      alert("Changes saved successfully.");
+    if (err) {
+      alert("Failed to save changes.");
+    } else {
+      alert("Bill updated successfully.");
       document.getElementById("saveEditBtn").style.display = "none";
       editingBillKey = null;
+
+      generateUpdatedKOT(billNo, items); // 🔥 Trigger new KOT slip
     }
   });
 }
+
 </script>
 <script>
 // ==== SETTLEMENT ====
@@ -739,6 +792,7 @@ if (role === "staff") {
           if (match) {
             const name = match[1];
             const qty = parseInt(match[2]);
+if (isNaN(qty) || qty < 1) return console.warn("Invalid qty:", match[2]);
             const amt = parseFloat(match[3]);
             if (!itemsMap[name]) itemsMap[name] = { qty: 0, amt: 0 };
             itemsMap[name].qty += qty;
@@ -830,6 +884,7 @@ if (role === "staff") {
           if (match) {
             const name = match[1];
             const qty = parseInt(match[2]);
+if (isNaN(qty) || qty < 1) return console.warn("Invalid qty:", match[2]);
             const amt = parseFloat(match[3]);
             if (!itemsMap[name]) itemsMap[name] = { qty: 0, amt: 0 };
             itemsMap[name].qty += qty;
@@ -930,24 +985,38 @@ function loadBillForEdit(key) {
     editingBillKey = key;
     document.getElementById("saveEditBtn").style.display = "block";
 
-    document.getElementById("customerName").value = bill.name;
-    document.getElementById("customerMobile").value = bill.mobile;
+    document.getElementById("customerName").value = bill.name || "";
+    document.getElementById("customerMobile").value = bill.mobile || "";
     document.getElementById("tax").value = ((bill.tax / bill.subtotal) * 100).toFixed(2) || 0;
-    document.getElementById("billNumber").innerText = bill.billNo;
-    document.getElementById("customerDisplay").innerText = bill.name + " | " + bill.mobile;
+    document.getElementById("billNumber").innerText = bill.billNo || "---";
+    document.getElementById("customerDisplay").innerText = `${bill.name} | ${bill.mobile}`;
 
     billItems.length = 0;
+
+    let anyParsed = false;
     (bill.items || []).forEach(line => {
+      console.log("Parsing item line:", line);
       const match = line.match(/^(.*?) \(x(\d+)\) = ₹(\d+(?:\.\d+)?)/);
       if (match) {
-        const name = match[1], qty = parseInt(match[2]), total = parseFloat(match[3]);
-        const rate = total / qty;
+        const name = match[1].trim();
+        const qty = parseInt(match[2]);
+if (isNaN(qty) || qty < 1) return console.warn("Invalid qty:", match[2]);
+        const total = parseFloat(match[3]) || 0;
+        const rate = qty ? total / qty : 0;
         billItems.push({ name, qty, rate });
+        anyParsed = true;
+      } else {
+        console.warn("⚠️ Could not parse line:", line);
       }
     });
 
+    if (!anyParsed) {
+      alert("⚠️ No items could be loaded. Please check data format.");
+      return;
+    }
+
     renderBill();
-    alert("Bill loaded. Make changes and click Save.");
+    alert("✅ Bill loaded. Make changes and click Save.");
   });
 }
 
@@ -1053,6 +1122,66 @@ if (role === "staff") {
   document.getElementById("settleMode").value = "";
   document.getElementById("txnId").value = "";
   populateSettlementDropdown(); // 🔁 refresh list after resettle
+}
+function fixIncompleteBills() {
+  const db = firebase.database();
+  db.ref("bills").once("value").then(snapshot => {
+    const bills = snapshot.val() || {};
+    let fixedCount = 0;
+    let unchanged = 0;
+
+    const updates = {};
+
+    Object.entries(bills).forEach(([key, bill]) => {
+      if (!Array.isArray(bill.items)) return;
+
+      let changed = false;
+      let subtotal = 0;
+
+      const newItems = bill.items.map(line => {
+        const match = line.match(/^(.*?) \(x(\d+)\) = ₹(\d+(?:\.\d+)?)/);
+        if (!match) return line;
+
+        const name = match[1];
+        const qty = parseInt(match[2]);
+if (isNaN(qty) || qty < 1) return console.warn("Invalid qty:", match[2]);
+        const total = parseFloat(match[3]) || 0;
+        subtotal += total;
+
+        return `${name} (x${qty}) = ₹${(qty * (total / qty)).toFixed(2)}`;
+      });
+
+      const fixed = {
+        items: newItems,
+        subtotal: bill.subtotal ?? subtotal,
+        tax: bill.tax ?? 0,
+        total: bill.total ?? subtotal,
+        paymentMode: bill.paymentMode || "CASH",
+        createdAt: bill.createdAt || bill.date || new Date().toISOString(),
+        kotNo: bill.kotNo ?? 999
+      };
+
+      Object.entries(fixed).forEach(([field, value]) => {
+        if (bill[field] === undefined) {
+          updates[`bills/${key}/${field}`] = value;
+          changed = true;
+        }
+      });
+
+      if (changed) fixedCount++;
+      else unchanged++;
+    });
+
+    if (Object.keys(updates).length === 0) {
+      alert("No incomplete bills found.");
+      return;
+    }
+
+    db.ref().update(updates, err => {
+      if (err) return alert("Fix failed: " + err.message);
+      alert(`✅ Bills fixed: ${fixedCount}\n➖ Bills unchanged: ${unchanged}`);
+    });
+  });
 }
 </script>
 </html>
