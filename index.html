@@ -1,36 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Pradiksha Restro Soft</title>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-</head>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
   <style>
     body {
       font-family: sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    .main-container {
       display: flex;
       flex-wrap: wrap;
       gap: 20px;
       padding: 10px;
-      justify-content: center;
     }
+
+    .left-panel, .right-panel {
+      flex: 1;
+      min-width: 300px;
+      padding: 10px;
+    }
+
     .bill-preview, .bill-controls {
-      flex: 1 1 320px;
-      max-width: 480px;
+      max-width: 100%;
     }
+
     table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 10px;
     }
+
     th, td {
       border: 1px solid #ccc;
       padding: 6px;
       font-size: 14px;
     }
+
     input, select, button {
       padding: 8px;
       margin-top: 6px;
@@ -38,6 +53,7 @@
       box-sizing: border-box;
       font-size: 14px;
     }
+
     #reportViewer, #kotLogViewer {
       display: none;
       margin-top: 10px;
@@ -47,68 +63,106 @@
       overflow-y: auto;
       font-size: 13px;
     }
-.main-container { display: flex; flex-wrap: wrap; padding: 10px; }
-.left-panel, .right-panel { flex: 1; min-width: 150px; padding: 10px; }
-    .logout { background: #fff; color: #ff9800; padding: 6px 10px; border: none; border-radius: 4px; cursor: pointer; }
-    .section { margin-bottom: 20px; border: 1px solid #ddd; padding: 10px; border-radius: 6px; }
-.qr-code { text-align: center; margin-top: 10px; }
-    .qr-code img { width: 80px; height: auto; margin: 0 auto; display: block; }
-    .qr-label { font-size: 0.75em; margin-top: 5px; text-align: center; }
-    .no-print { display: block; }
-   @media print {
-  body {
-    margin: 0;
-    padding: 0;
-    width: 210px; /* ~3 inch in pixels */
-  }
- #billTable, .no-print, input, select, button {
-    display: none !important;
-  }
 
-  #printTable {
-    display: table !important;
-  }
-  .app-header,
-  .right-panel,
-  .no-print,
-  input,
-  select,
-  button {
-    display: none !important;
-  }
+    .logout {
+      background: #fff;
+      color: #ff9800;
+      padding: 6px 10px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
 
-  #printSection {
-    width: 203px;
-    font-size: 10px;
-    margin: 0 auto;
-    padding: 0;
-  }
+    .section {
+      margin-bottom: 20px;
+      border: 1px solid #ddd;
+      padding: 10px;
+      border-radius: 6px;
+    }
 
-  th, td {
-    padding: 2px;
-    border: none;
-    font-size: 10px;
-    text-align: left;
-  }
+    .qr-code {
+      text-align: center;
+      margin-top: 10px;
+    }
 
-  h2, p {
-    font-size: 10px;
-    margin: 0;
-    padding: 0;
-  }
+    .qr-code img {
+      width: 80px;
+      height: auto;
+      margin: 0 auto;
+      display: block;
+    }
 
-  .qr-code img {
-    width: 100px;
-    margin: 0 auto;
-    display: block;
-  }
+    .qr-label {
+      font-size: 0.75em;
+      margin-top: 5px;
+      text-align: center;
+    }
 
-  .qr-label {
-    font-size: 8px;
-    text-align: center;
-  }
+    .no-print {
+      display: block;
+    }
+
+#customerSuggestions {
+  max-height: 150px;
+  overflow-y: auto;
+  z-index: 1000;
+  width: 100%;
 }
+    @media print {
+      body {
+        margin: 0;
+        padding: 0;
+        width: 210px;
+      }
 
+      #billTable, .no-print, input, select, button {
+        display: none !important;
+      }
+
+      #printTable {
+        display: table !important;
+      }
+
+      .app-header,
+      .right-panel,
+      .no-print,
+      input,
+      select,
+      button {
+        display: none !important;
+      }
+
+      #printSection {
+        width: 203px;
+        font-size: 10px;
+        margin: 0 auto;
+        padding: 0;
+      }
+
+      th, td {
+        padding: 2px;
+        border: none;
+        font-size: 10px;
+        text-align: left;
+      }
+
+      h2, p {
+        font-size: 10px;
+        margin: 0;
+        padding: 0;
+      }
+
+      .qr-code img {
+        width: 100px;
+        margin: 0 auto;
+        display: block;
+      }
+
+      .qr-label {
+        font-size: 8px;
+        text-align: center;
+      }
+    }
   </style>
 </head>
 <body>
@@ -123,13 +177,24 @@
       <div class="bill-preview" id="printSection">
         <div style="text-align: center;">
           <img src="logo.png" alt="Panchabyanjan Logo" style="height: 60px; margin-bottom: 5px;">
-          <h2 style="text-align:center;">Panchabyanjan Restaurant and Caterer</h2>
-          <p style="text-align:center;">86 Tarafdarpara Rd, Kolkata-700151</p>
-          <p style="text-align:center;">Contact Us @ 6290300741</p>
-          <p style="text-align:center;">email - panchabyanjanrestaurant@gmail.com</p>
-          <p><strong>Bill No:</strong> <span id="billNumber">---</span></p>
-          <p id="customerDisplay"></p>
-        </div>
+          <h3>Panchabyanjan Restaurant and Caterer</h3>
+  <p>86 Tarafdarpara Rd, Kolkata-700151</p>
+  <p>Contact Us @ 6290300741</p>
+  <p>email - panchabyanjanrestaurant@gmail.com</p>
+</div>
+
+<hr />
+
+<div style="display: flex; justify-content: space-between; font-weight: bold;">
+  <div>Bill No: <span id="billNumber">---</span></div>
+  <div>Table No: <span id="printTableNumber">---</span></div>
+</div>
+
+<div style="display: flex; justify-content: space-between;">
+  <div><span id="customerDisplay">---</span></div>
+  <div>Date: <span id="printBillTime">---</span></div>
+</div>
+<hr />
         <table id="billTable">
           <thead><tr><th>Item</th><th>Qty</th><th>Rate</th><th>Total</th></tr></thead>
           <tbody></tbody>
@@ -170,7 +235,9 @@
       <div class="section" id="billingSection">
         <h3>Generate Bill</h3>
         <input type="text" id="customerName" placeholder="Customer Name" />
-        <input type="text" id="customerMobile" placeholder="Mobile Number" />
+        <input type="text" id="customerMobile" placeholder="Mobile" oninput="showCustomerSuggestions()" autocomplete="off" />
+<div id="customerSuggestions" style="display: none; border: 1px solid #ccc; background: white; position: absolute; z-index: 10;"></div>
+        <input type="number" id="tableNumber" placeholder="Table Number" required />
         <input type="number" id="tax" placeholder="Tax % (optional)" />
         <input type="text" id="menuSearch" placeholder="Search menu..." oninput="filterMenu()" />
         <select id="menuSelect" size="5"></select>
@@ -434,6 +501,10 @@ function renderBill() {
   document.getElementById("taxAmount").innerText = taxAmt.toFixed(2);
   document.getElementById("grandTotal").innerText = total.toFixed(2);
 
+const now = new Date();
+const billDateTime = now.toLocaleString();
+document.getElementById("printBillTime").innerText = billDateTime;
+
   if (printBody) {
     const printSubtotal = document.getElementById("printSubtotal");
     const printTax = document.getElementById("printTax");
@@ -457,25 +528,34 @@ function removeItem(index) {
     renderBill();
   }
 }
-function generateBill() {
-  const name = document.getElementById("customerName").value;
-  const mobile = document.getElementById("customerMobile").value;
-  if (!name || !mobile) return alert("Customer info required");
-  document.getElementById("customerDisplay").innerText = name + " | " + mobile;
+  function generateBill() {
+  const name = document.getElementById("customerName").value.trim();
+  const mobile = document.getElementById("customerMobile").value.trim();
+  const tableNo = document.getElementById("tableNumber").value;
 
-  db.ref("lastBillNo").transaction(curr => (curr || 1000) + 1).then(res => {
-    const billNo = res.snapshot.val();
-    document.getElementById("billNumber").innerText = billNo;
-    saveAndStoreBill(billNo, name, mobile);
-  }).catch(() => {
-    const localBill = parseInt(localStorage.getItem("lastBill") || "1000") + 1;
-    localStorage.setItem("lastBill", localBill);
-    document.getElementById("billNumber").innerText = localBill;
-    saveAndStoreBill(localBill, name, mobile);
-  });
+  if (!name || !mobile) return alert("Customer info required");
+  if (!tableNo) return alert("Please enter a Table Number");
+
+  // ✅ Save customer to Firebase
+  const customerKey = mobile;
+  db.ref("customers/" + customerKey).set({ name, mobile });
+
+  document.getElementById("customerDisplay").innerText = name + " | " + mobile;
+  document.getElementById("printTableNumber").innerText = tableNo;
+
+db.ref("lastBillNo").transaction(curr => (curr || 1000) + 1).then(res => {
+  const billNo = res.snapshot.val();
+  document.getElementById("billNumber").innerText = billNo;
+  saveAndStoreBill(billNo, name, mobile, tableNo); // ✅ pass tableNo
+}).catch(() => {
+  const localBill = parseInt(localStorage.getItem("lastBill") || "1000") + 1;
+  localStorage.setItem("lastBill", localBill);
+  document.getElementById("billNumber").innerText = localBill;
+  saveAndStoreBill(localBill, name, mobile, tableNo); // ✅ pass tableNo
+});
 }
 
-function saveAndStoreBill(billNo, name, mobile) {
+function saveAndStoreBill(billNo, name, mobile, tableNo) {
   const tax = parseFloat(document.getElementById("tax").value) || 0;
   let subtotal = 0;
 
@@ -490,28 +570,34 @@ function saveAndStoreBill(billNo, name, mobile) {
   const taxAmt = subtotal * tax / 100;
   const grandTotal = subtotal + taxAmt;
 
-  const bill = {
-    billNo,
-    date: new Date().toISOString(),
-    name,
-    mobile,
-    items,
-    subtotal,
-    tax: taxAmt,
-    total: grandTotal,
-    paymentMode: "Unpaid"
-  };
+  const now = new Date();
+const billDateTime = now.toLocaleString(); // Save readable datetime
+
+const bill = {
+  billNo,
+  date: now.toISOString(),         // ISO for backend usage
+  readableDate: billDateTime,      // readable version for display
+  name,
+  mobile,
+  tableNo,
+  items,
+  subtotal,
+  tax: taxAmt,
+  total: grandTotal,
+  paymentMode: "Unpaid"
+};
+
 
   const history = JSON.parse(localStorage.getItem("billHistory") || "[]");
   history.push(bill);
   localStorage.setItem("billHistory", JSON.stringify(history));
 
   db.ref("bills").push(bill);
-  generateKOT(billNo, items);
+  generateKOT(billNo, items, tableNo);
   showSettlementTab(); 
 }
 
-function generateKOT(billNo, items) {
+function generateKOT(billNo, items, tableNo){
   const kotId = "KOT" + Date.now();
   db.ref("lastKOTNo").transaction(curr => (curr || 2000) + 1).then(res => {
     const kotNo = res.snapshot.val();
@@ -519,6 +605,7 @@ function generateKOT(billNo, items) {
       kotId,
       kotNo,
       billNo,
+      tableNo,
       items,
       createdAt: new Date().toISOString()
     };
@@ -535,6 +622,8 @@ function generateKOT(billNo, items) {
         <h3 style="text-align:center;">KOT</h3>
         <p>KOT No: ${kotNo}</p>
         <p>Bill No: ${billNo}</p>
+        <p>Table No: ${tableNo}</p>
+        <p>Date: ${new Date().toLocaleString()}</p>
         <hr />
         <pre>${itemLines.join("\n")}</pre>
         <hr />
@@ -552,48 +641,98 @@ function generateKOT(billNo, items) {
 function generateUpdatedKOT(billNo, items) {
   const kotId = "KOT" + Date.now();
 
-  db.ref("lastKOTNo").transaction(curr => (curr || 2000) + 1).then(res => {
-    const kotNo = res.snapshot.val();
-    const kot = {
-      kotId,
-      kotNo,
-      billNo,
-      items,
-      createdAt: new Date().toISOString(),
-      updated: true  // ✅ flag for reporting
-    };
+  // Step 1: Find and delete existing KOTs for this bill
+  db.ref("kots").once("value", snap => {
+    const allKOTs = snap.val() || {};
+    const deleteOps = {};
 
-    db.ref("kots").push(kot);
-
-    const itemLines = items.map(i => {
-      const match = i.match(/^(.*?) \(x(\d+)\)/);
-      return match ? `• ${match[1]}  x${match[2]}` : `• ${i}`;
+    Object.entries(allKOTs).forEach(([key, kot]) => {
+      if (kot.billNo === billNo) {
+        deleteOps[`kots/${key}`] = null; // Mark for deletion
+      }
     });
 
-    const kotText = `
-      <div style="width: 203px; font-size: 10px; font-family: monospace;">
-        <h3 style="text-align:center;">Panchabyanjan Restaurant and Caterer</h3>
-        <h3 style="text-align:center;">UPDATE OF BILL NO: ${billNo}</h3>
-        <p>KOT No: ${kotNo}</p>
-        <hr />
-        <pre>${itemLines.join("\n")}</pre>
-        <hr />
-        <p style="text-align:center;">Updated Kitchen Copy</p>
-      </div>
-    `;
+    db.ref().update(deleteOps, err => {
+      if (err) {
+        console.error("❌ Failed to delete old KOTs:", err);
+        return alert("Could not remove previous KOTs.");
+      }
 
-    const win = window.open("", "_blank");
-    win.document.write(kotText);
-    win.document.close();
-    win.focus();
-    win.print();
+      // Step 2: Fetch latest KOT number and create new one
+      db.ref("lastKOTNo").transaction(curr => (curr || 2000) + 1).then(res => {
+        const kotNo = res.snapshot.val();
+
+        // ✅ Fetch table number again for accuracy
+        const tableNo = document.getElementById("tableNumber").value || "N/A";
+
+        const kot = {
+          kotId,
+          kotNo,
+          billNo,
+          tableNo,
+          items,
+          createdAt: new Date().toISOString(),
+          updated: true
+        };
+
+        db.ref("kots").push(kot);
+
+        // Format item lines
+        const itemLines = items.map(i => {
+          const match = i.match(/^(.*?) \(x(\d+)\)/);
+          return match ? `• ${match[1]}  x${match[2]}` : `• ${i}`;
+        });
+
+        // Generate printable KOT
+        const kotText = `
+          <div style="width: 203px; font-size: 10px; font-family: monospace;">
+            <h3 style="text-align:center;">Panchabyanjan Restaurant and Caterer</h3>
+            <h3 style="text-align:center;">UPDATE OF BILL NO: ${billNo}</h3>
+            <p>KOT No: ${kotNo}</p>
+            <p>Table No: ${tableNo}</p>
+            <p>Date: ${new Date().toLocaleString()}</p>
+            <hr />
+            <pre>${itemLines.join("\n")}</pre>
+            <hr />
+            <p style="text-align:center;">Updated Kitchen Copy</p>
+          </div>
+        `;
+
+        const win = window.open("", "_blank");
+        win.document.write(kotText);
+        win.document.close();
+        win.focus();
+        win.print();
+      });
+    });
   });
 }
+
 function printAndReset() {
+  // ✅ Step 1: Fill all calculated print fields before printing
+  const name = document.getElementById("customerName").value.trim();
+  const mobile = document.getElementById("customerMobile").value.trim();
+  const tableNo = document.getElementById("tableNumber").value.trim();
+  const taxPercent = parseFloat(document.getElementById("tax").value) || 0;
+
+  const subtotal = billItems.reduce((sum, i) => sum + (i.qty * i.rate), 0);
+  const taxAmount = subtotal * taxPercent / 100;
+  const grandTotal = subtotal + taxAmount;
+
+  // ✅ Update bill print fields
+  document.getElementById("customerDisplay").innerText = `${name} | ${mobile}`;
+  document.getElementById("printTableNo").innerText = tableNo;
+  document.getElementById("subtotal").innerText = subtotal.toFixed(2);
+  document.getElementById("taxAmount").innerText = taxAmount.toFixed(2);
+  document.getElementById("grandTotal").innerText = grandTotal.toFixed(2);
+  document.getElementById("printBillTime").innerText = new Date().toLocaleString();
+
+  // ✅ Step 2: Now print
   window.onafterprint = () => {
     billItems.length = 0;
     document.getElementById("customerName").value = "";
     document.getElementById("customerMobile").value = "";
+    document.getElementById("tableNumber").value = "";
     document.getElementById("tax").value = "";
     document.getElementById("menuSearch").value = "";
     document.getElementById("qty").value = 1;
@@ -607,7 +746,8 @@ function printAndReset() {
     populateReprintDropdown();
     document.getElementById("customerName").focus(); // optional
   };
-  window.print();  // ✅ after setting handler
+
+  window.print();  // ✅ after setting values
 }
 
 function populateReprintDropdown() {
@@ -753,22 +893,46 @@ function downloadCSV(data, filename) {
 }
 
 function downloadHistoryByDateRangeCSV() {
-const role = sessionStorage.getItem("role");
-if (role === "staff") {
-  alert("Access denied");
-  return;
-}
+  const role = sessionStorage.getItem("role");
+  if (role === "staff") {
+    alert("Access denied");
+    return;
+  }
+
   const from = prompt("From date (YYYY-MM-DD)");
   const to = prompt("To date (YYYY-MM-DD)");
-  db.ref("bills").once("value", snap => {
-    const all = snap.val();
-    const rows = [["Bill No", "Date", "Time","Customer", "Mobile", "Total"]];
-    Object.values(all || {}).forEach(b => {
+
+  Promise.all([
+    db.ref("bills").once("value"),
+    db.ref("kots").once("value")
+  ]).then(([billSnap, kotSnap]) => {
+    const bills = billSnap.val() || {};
+    const kots = kotSnap.val() || {};
+
+    // Group KOTs by billNo
+    const kotMap = {};
+    Object.values(kots).forEach(k => {
+      if (!kotMap[k.billNo]) kotMap[k.billNo] = [];
+      kotMap[k.billNo].push(k.updated ? `UPDATED #${k.kotNo}` : `#${k.kotNo}`);
+    });
+
+    const rows = [["Bill No", "Date", "Time", "Customer", "Mobile", "Total", "KOTs"]];
+
+    Object.values(bills).forEach(b => {
       const d = b.date?.split("T")[0];
       if (d >= from && d <= to) {
-        rows.push([b.billNo, formatDateLocal(b.date), b.name, b.mobile, b.total]);
+        const kotList = kotMap[b.billNo] ? kotMap[b.billNo].join(" | ") : "—";
+        rows.push([
+          b.billNo,
+          formatDateLocal(b.date),
+          b.name,
+          b.mobile,
+          b.total,
+          kotList
+        ]);
       }
     });
+
     downloadCSV(rows, `bill_history_${from}_to_${to}.csv`);
   });
 }
@@ -918,15 +1082,25 @@ function displayInViewer(rows, title) {
 function viewKOTLog() {
   const from = prompt("From date (YYYY-MM-DD)");
   const to = prompt("To date (YYYY-MM-DD)");
+
   db.ref("kots").once("value", snap => {
     const all = snap.val();
-    const rows = [["KOT No", "Bill No", "Items", "Created"]];
+    const rows = [["KOT No", "Bill No", "Table", "Items", "Created", "Type"]];
+
     Object.values(all || {}).forEach(k => {
       const d = k.createdAt?.split("T")[0];
       if (d >= from && d <= to) {
-        rows.push([k.kotNo, k.billNo, (k.items || []).join(" / "), k.createdAt]);
+        rows.push([
+          k.kotNo,
+          k.billNo,
+          k.tableNo || "N/A",
+          (k.items || []).join(" / "),
+          formatDateLocal(k.createdAt),
+          k.updated ? "UPDATE" : "NEW"
+        ]);
       }
     });
+
     const viewer = document.getElementById("kotLogViewer");
     viewer.innerHTML = `<h3>KOT Log</h3>`;
     const table = document.createElement("table");
@@ -935,10 +1109,12 @@ function viewKOTLog() {
         `<${i === 0 ? "th" : "td"}>${col}</${i === 0 ? "th" : "td"}>`).join("")
       }</tr>`
     ).join("");
+
     viewer.appendChild(table);
     viewer.style.display = "block";
   });
 }
+
 
 // ==== ADMIN BILL/KOT MANAGERS ====
 function showManageBillsTab() {
@@ -1183,5 +1359,49 @@ if (isNaN(qty) || qty < 1) return console.warn("Invalid qty:", match[2]);
     });
   });
 }
+// ✅ Hide suggestions when clicking outside
+document.addEventListener("click", function (e) {
+  const box = document.getElementById("customerSuggestions");
+  if (box && !box.contains(e.target) && e.target.id !== "customerMobile") {
+    box.style.display = "none";
+  }
+}); // ✅ Close the event listener properly
+
+// ✅ Suggestion function — OUTSIDE the event listener
+function showCustomerSuggestions() {
+  const input = document.getElementById("customerMobile");
+  const suggestionBox = document.getElementById("customerSuggestions");
+  const mobile = input.value.trim();
+
+  if (mobile.length < 3) {
+    suggestionBox.style.display = "none";
+    return;
+  }
+
+  firebase.database().ref("customers").orderByKey()
+    .startAt(mobile).endAt(mobile + "\uf8ff").once("value", snapshot => {
+      const customers = snapshot.val();
+      suggestionBox.innerHTML = "";
+
+      if (!customers) {
+        suggestionBox.style.display = "none";
+        return;
+      }
+
+      Object.values(customers).forEach(cust => {
+        const div = document.createElement("div");
+        div.textContent = `${cust.name} | ${cust.mobile}`;
+        div.onclick = () => {
+          document.getElementById("customerName").value = cust.name;
+          document.getElementById("customerMobile").value = cust.mobile;
+          suggestionBox.style.display = "none";
+        };
+        suggestionBox.appendChild(div);
+      });
+
+      suggestionBox.style.display = "block";
+    });
+}
+
 </script>
 </html>
