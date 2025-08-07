@@ -1,51 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
-<!DOCTYPE html>
-<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Pradiksha Restro Soft</title>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+</head>
   <style>
     body {
       font-family: sans-serif;
-      margin: 0;
-      padding: 0;
-    }
-
-    .main-container {
       display: flex;
       flex-wrap: wrap;
       gap: 20px;
       padding: 10px;
+      justify-content: center;
     }
-
-    .left-panel, .right-panel {
-      flex: 1;
-      min-width: 300px;
-      padding: 10px;
-    }
-
     .bill-preview, .bill-controls {
-      max-width: 100%;
+      flex: 1 1 320px;
+      max-width: 480px;
     }
-
     table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 10px;
     }
-
     th, td {
       border: 1px solid #ccc;
       padding: 6px;
       font-size: 14px;
     }
-
     input, select, button {
       padding: 8px;
       margin-top: 6px;
@@ -53,7 +38,6 @@
       box-sizing: border-box;
       font-size: 14px;
     }
-
     #reportViewer, #kotLogViewer {
       display: none;
       margin-top: 10px;
@@ -63,106 +47,83 @@
       overflow-y: auto;
       font-size: 13px;
     }
+.main-container { display: flex; flex-wrap: wrap; padding: 10px; }
+.left-panel, .right-panel { flex: 1; min-width: 150px; padding: 10px; }
+    .logout { background: #fff; color: #ff9800; padding: 6px 10px; border: none; border-radius: 4px; cursor: pointer; }
+    .section { margin-bottom: 20px; border: 1px solid #ddd; padding: 10px; border-radius: 6px; }
+.qr-code { text-align: center; margin-top: 10px; }
+    .qr-code img { width: 80px; height: auto; margin: 0 auto; display: block; }
+    .qr-label { font-size: 0.75em; margin-top: 5px; text-align: center; }
+    .no-print { display: block; }
+   @media print {
+  body {
+    margin: 0;
+    padding: 0;
+    width: 210px; /* ~3 inch in pixels */
+  }
+ #billTable, .no-print, input, select, button {
+    display: none !important;
+  }
 
-    .logout {
-      background: #fff;
-      color: #ff9800;
-      padding: 6px 10px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
+  #printTable {
+    display: table !important;
+  }
+  .app-header,
+  .right-panel,
+  .no-print,
+  input,
+  select,
+  button {
+    display: none !important;
+  }
 
-    .section {
-      margin-bottom: 20px;
-      border: 1px solid #ddd;
-      padding: 10px;
-      border-radius: 6px;
-    }
+  #printSection {
+    width: 203px;
+    font-size: 10px;
+    margin: 0 auto;
+    padding: 0;
+  }
 
-    .qr-code {
-      text-align: center;
-      margin-top: 10px;
-    }
+  th, td {
+    padding: 2px;
+    border: none;
+    font-size: 10px;
+    text-align: left;
+  }
 
-    .qr-code img {
-      width: 80px;
-      height: auto;
-      margin: 0 auto;
-      display: block;
-    }
+  h2, p {
+    font-size: 10px;
+    margin: 0;
+    padding: 0;
+  }
 
-    .qr-label {
-      font-size: 0.75em;
-      margin-top: 5px;
-      text-align: center;
-    }
+  .qr-code img {
+    width: 100px;
+    margin: 0 auto;
+    display: block;
+  }
 
-    .no-print {
-      display: block;
-    }
-
-#customerSuggestions {
-  max-height: 150px;
-  overflow-y: auto;
-  z-index: 1000;
-  width: 100%;
+  .qr-label {
+    font-size: 8px;
+    text-align: center;
+  }
+.bill-preview {
+  width: 280px;
+  font-size: 12px;
+  font-family: Arial, sans-serif;
+  margin: auto;
+  padding: 10px;
+  border: 1px solid #000;
 }
-    @media print {
-      body {
-        margin: 0;
-        padding: 0;
-        width: 210px;
-      }
 
-      #billTable, .no-print, input, select, button {
-        display: none !important;
-      }
+.bill-preview h3 {
+  font-size: 14px;
+  margin: 5px 0;
+}
 
-      #printTable {
-        display: table !important;
-      }
-
-      .app-header,
-      .right-panel,
-      .no-print,
-      input,
-      select,
-      button {
-        display: none !important;
-      }
-
-      #printSection {
-        width: 203px;
-        font-size: 10px;
-        margin: 0 auto;
-        padding: 0;
-      }
-
-      th, td {
-        padding: 2px;
-        border: none;
-        font-size: 10px;
-        text-align: left;
-      }
-
-      h2, p {
-        font-size: 10px;
-        margin: 0;
-        padding: 0;
-      }
-
-      .qr-code img {
-        width: 100px;
-        margin: 0 auto;
-        display: block;
-      }
-
-      .qr-label {
-        font-size: 8px;
-        text-align: center;
-      }
-    }
+.bill-preview p, .bill-preview div {
+  margin: 2px 0;
+}
   </style>
 </head>
 <body>
@@ -177,35 +138,34 @@
       <div class="bill-preview" id="printSection">
         <div style="text-align: center;">
           <img src="logo.png" alt="Panchabyanjan Logo" style="height: 60px; margin-bottom: 5px;">
-          <h3>Panchabyanjan Restaurant and Caterer</h3>
-  <p>86 Tarafdarpara Rd, Kolkata-700151</p>
-  <p>Contact Us @ 6290300741</p>
-  <p>email - panchabyanjanrestaurant@gmail.com</p>
-</div>
-
-<hr />
-
+          <h2 style="text-align:center;">Panchabyanjan Restaurant and Caterer</h2>
+          <p style="text-align:center;">86 Tarafdarpara Rd, Kolkata-700151</p>
+          <p style="text-align:center;">Contact Us @ 6290300741</p>
+          <p style="text-align:center;">email - panchabyanjanrestaurant@gmail.com</p>
 <div style="display: flex; justify-content: space-between; font-weight: bold;">
   <div>Bill No: <span id="billNumber">---</span></div>
-  <div>Table No: <span id="printTableNumber">---</span></div>
+  <div>KOT No: <span id="kotNumberDisplay">---</span></div>
 </div>
-
-<div style="display: flex; justify-content: space-between;">
-  <div><span id="customerDisplay">---</span></div>
+<div style="display: flex; justify-content: space-between; font-weight: bold;">
+  <div>Table No: <span id="printTableNumber">---</span></div>
   <div>Date: <span id="printBillTime">---</span></div>
 </div>
-<hr />
+<div style="text-align:left; font-weight: bold;">
+  Customer: <span id="customerDisplay">---</span>
+</div>
+        </div>
         <table id="billTable">
-          <thead><tr><th>Item</th><th>Qty</th><th>Rate</th><th>Total</th></tr></thead>
+  <thead><tr><th>Item</th><th>Qty</th><th>Rate</th><th>Total</th></tr></thead>
+  <tbody></tbody>
+</table>
           <tbody></tbody>
         </table>
 <table id="printTable" style="display: none;">
   <thead><tr><th>Item</th><th>Qty</th><th>Rate</th><th>Total</th></tr></thead>
   <tbody id="printTableBody"></tbody>
 </table>
-        <p style="text-align:right;"><strong>Subtotal:</strong> ₹<span id="subtotal">0</span></p>
-        <p style="text-align:right;"><strong>Tax:</strong> ₹<span id="taxAmount">0</span></p>
-        <p style="text-align:right;"><strong>Total:</strong> ₹<span id="grandTotal">0</span></p>
+<pre id="totalsBox" style="text-align:right; font-family: monospace;"></pre>
+       
         <p style="margin-top: 10px; font-size: 0.75em; text-align: center;">Thank you for your order!<br>WE ACCEPT PARTY BOOKING</p>
        <div class="qr-code">
           <div class="qr-label">Scan to Pay</div>
@@ -234,15 +194,14 @@
     <div class="right-panel">
       <div class="section" id="billingSection">
         <h3>Generate Bill</h3>
+     <label>Customer Mobile</label>
+  <input id="customerMobile" autocomplete="off" />
+  <div id="customerSuggestions"></div>
         <input type="text" id="customerName" placeholder="Customer Name" />
-        <input type="text" id="customerMobile" placeholder="Mobile" oninput="showCustomerSuggestions()" autocomplete="off" />
-<div id="customerSuggestions" style="display: none; border: 1px solid #ccc; background: white; position: absolute; z-index: 10;"></div>
-        <input type="number" id="tableNumber" placeholder="Table Number" required />
+        <input type="number" id="tableNumber" placeholder="Enter Table No" required />
         <input type="number" id="tax" placeholder="Tax % (optional)" />
         <input type="text" id="menuSearch" placeholder="Search menu..." oninput="filterMenu()" />
-        <select id="menuSelect" size="5"></select>
-        <input type="number" id="qty" value="1" placeholder="Quantity" />
-        <button onclick="addItem()">Add Item</button>
+<div id="menuSuggestions" style="position:absolute; background:#fff; border:1px solid #ccc; max-height:150px; overflow:auto; display:none; z-index:10;"></div>
         <button onclick="addSpecialItem()">Add Special Item</button>
         <button onclick="generateBill()">Generate Bill</button>
         <button onclick="printAndReset()">Print Bill</button>
@@ -278,6 +237,24 @@
       </div>
     </div> <!-- END RIGHT PANEL -->
   </div> <!-- END MAIN CONTAINER -->
+<!-- Menu Type and Rate Modal -->
+<div id="typeRateModal" style="display: none; position: fixed; top: 0; left: 0;
+  width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); z-index: 1000;">
+  <div style="background: white; width: 300px; margin: 10% auto; padding: 20px; border-radius: 8px;">
+    <h3 id="modalItemName">Select Type & Rate</h3>
+
+    <label for="typeSelect">Type:</label>
+    <select id="typeSelect" style="width: 100%; margin-bottom: 10px;"></select>
+
+    <label for="rateSelect">Rate:</label>
+    <select id="rateSelect" style="width: 100%; margin-bottom: 20px;"></select>
+
+    <input type="number" id="popupQty" value="1" min="1" style="width:100%; margin-bottom: 15px;" placeholder="Quantity" />
+
+    <button onclick="confirmPopupSelection()">Confirm</button>
+    <button onclick="closePopup()">Cancel</button>
+  </div>
+</div>
 </body>
 <script>
   // Firebase Config
@@ -334,111 +311,329 @@
       });
     }
   });
+document.getElementById("customerMobile").addEventListener("input", function () {
+  const input = this.value.trim();
+  const suggestionBox = document.getElementById("customerSuggestions");
+
+  if (input.length < 3) {
+    suggestionBox.style.display = "none";
+    return;
+  }
+
+  firebase.database().ref("customers")
+    .orderByKey()
+    .startAt(input)
+    .endAt(input + "\uf8ff")
+    .once("value", snapshot => {
+      const data = snapshot.val();
+      suggestionBox.innerHTML = "";
+
+      if (!data) {
+        suggestionBox.style.display = "none";
+        return;
+      }
+
+      Object.values(data).forEach(customer => {
+        const div = document.createElement("div");
+        div.textContent = `${customer.name} | ${customer.mobile}`;
+        div.onclick = () => {
+          document.getElementById("customerName").value = customer.name;
+          document.getElementById("customerMobile").value = customer.mobile;
+          suggestionBox.style.display = "none";
+        };
+        suggestionBox.appendChild(div);
+      });
+
+      suggestionBox.style.display = "block";
+    });
+});
+
+// Hide suggestions when clicking outside
+document.addEventListener("click", function (e) {
+  const box = document.getElementById("customerSuggestions");
+  if (box && !box.contains(e.target) && e.target.id !== "customerMobile") {
+    box.style.display = "none";
+  }
+});
+
 </script>
 </body>
 </html>
 <script>
-const menu = {
-  "Shahi Paneer": 120,
-      "Matar Paneer": 100,
-      "Aloo Posto": 70,
-      "Kasha Aloo Dum": 50,
-      "Moong Dal": 60,
-      "Paneer Butter Masala": 140,
-      "Paneer Bhurjee": 120,
-      "Fish Finger (Bhetki) - 5pcs": 160,
-      "Fish Fry (Bhetki)": 180,
-      "Dry Chilli Chicken - 8pcs": 150,
-      "Chicken Finger - 6pcs": 120,
-      "Chicken Pakora - 6pcs": 100,
-      "Paneer Pakora - 6pcs": 120,
-      "Egg Chicken Fried Rice": 140,
-      "Veg Fried Rice": 80,
-      "Egg Fried Rice": 100,
-      "Chicken Fried Rice": 120,
-      "Basanti Polao": 80,
-      "Steamed Rice - Basmati": 70,
-      "Steamed Rice - Plain": 50,
-      "Roti per pc": 6,
-      "Tawa Paratha per pc": 12,
-      "Green Salad": 50,
-      "Onion Salad": 30,
-      "Chicken Thali": 120,
-      "Fish Thali (Rohu)": 100,
-      "Fish Thali (Katla)": 100,
-      "Egg Thali": 80,
-      "Veg Thali": 60,
-      "Mutton Thali": 220,
-      "Chilli Chicken - 4pc": 80,
-      "Chilli Chicken - 8pc": 150,
-      "Schezwan Chicken - 4pc": 80,
-      "Schezwan Chicken - 8pc": 150,
-      "Hot Garlic Chicken - 4pc": 80,
-      "Hot Garlic Chicken - 8pc": 150,
-      "Chicken Kasha - 2pc": 70,
-      "Chicken Kasha - 4pc": 130,
-      "Shahi Chicken - 2pc": 90,
-      "Shahi Chicken - 4pc": 160,
-      "Egg Kasha - 1pc": 30,
-      "Egg Kasha - 2pc": 50,
-      "Rohu Fish Curry - 1pc": 60,
-      "Rohu Fish Curry - 2pc": 100,
-      "Katla Fish Curry - 1pc": 90,
-      "Katla Fish Curry - 2pc": 170,
-      "Mutton Kasha - 2pc": 160,
-      "Mutton Kasha - 4pc": 300,
-      "4pcs Roti+4pcs Chicken Kasha+Salad": 130,
-      "4pcs Roti+2pcs Chicken Kasha+Salad": 90,
-      "4pcs Roti+4pcs Chilli Chicken": 120,
-      "4pcs Roti+2pcs Chilli Chicken": 90,
-      "4pcs Roti+Paneer": 120,
-      "3pcs Tawa Paratha+Paneer": 120,
-      "3pcs Tawa Paratha+4pcs Chicken Kasha+Salad": 150,
-      "3pcs Tawa Paratha+2pcs Chicken Kasha+Salad": 120,
-      "3pcs Tawa Paratha+4pcs Chilli Chicken": 120,
-      "3pcs Tawa Paratha+2pcs Chilli Chicken": 90,
-      "Basanti Polao+4pcs Chicken Kasha": 150,
-      "Basanti Polao+2pcs Chicken Kasha": 100,
-      "Basanti Polao+2pcs Egg Kasha": 100,
-      "Basanti Polao+Paneer": 120,
-      "Basanti Polao+4pcs Mutton Kasha": 320,
-      "Basanti Polao+2pcs Mutton Kasha": 220,
-      "Veg Fried Rice+4pcs Chicken Kasha": 150,
-      "Veg Fried Rice+2pcs Chicken Kasha": 100,
-      "Veg Fried Rice+4pcs Chilli Chicken": 140,
-      "Veg Fried Rice+2pcs Chilli Chicken": 100,
-      "Veg Fried Rice+Paneer": 120,
-      "Egg Fried Rice+4pcs Chicken Kasha": 160,
-      "Egg Fried Rice+2pcs Chicken Kasha": 120,
-      "Egg Fried Rice+4pcs Chilli Chicken": 150,
-      "Egg Fried Rice+2pcs Chilli Chicken": 120,
-      "Egg Chicken Fried Rice+4pcs Chicken Kasha": 180,
-      "Egg Chicken Fried Rice+2pcs Chicken Kasha": 150,
-      "Egg Chicken Fried Rice+4pcs Chilli Chicken": 180,
-      "Egg Chicken Fried Rice+2pcs Chilli Chicken": 150
-};
-
-let billItems = [];
-
-function filterMenu() {
-  const search = document.getElementById("menuSearch").value.toLowerCase();
-  const menuSelect = document.getElementById("menuSelect");
-  menuSelect.innerHTML = "";
-  Object.keys(menu).forEach(item => {
-    if (item.toLowerCase().includes(search)) {
-      const opt = document.createElement("option");
-      opt.value = item;
-      opt.textContent = `${item} - ₹${menu[item]}`;
-      menuSelect.appendChild(opt);
+const menuItems = [
+  {
+    name: "Chicken Pakora",
+    rates: { Regular: 120, Special: 100  }
+  },
+  {
+    name: "Chicken Finger",
+    rates: { Regular: 120 }
+  },
+  {
+    name: "Fish Fry(Bhetki)",
+    rates: { Regular: 180 }
+  },
+  {
+    name: "Fish Finger",
+    rates: { Regular: 180, Special: 160 }
+  },
+  {
+    name: "Paneer Pakora",
+    rates: { Regular: 120 }
+  },
+  {
+    name: "French Fry",
+    rates: { Regular: 120 }
+  },
+  {
+    name: "Fish Finger (Bhetki) - 5pcs",
+    rates: { regular: 160 }
+  },
+  {
+    name: "Fish Fry (Bhetki)",
+    rates: { regular: 180 }
+  },
+  {
+    name: "Dry Chilli Chicken - 8pcs",
+    rates: { regular: 150 }
+  },
+  {
+    name: "Chicken Finger - 6pcs",
+    rates: { regular: 120 }
+  },
+  {
+    name: "Chicken Pakora (Boneless) - 6pcs",
+    rates: { regular: 100 }
+  },
+  {
+    name: "Paneer Pakora - 6pcs",
+    rates: { regular: 120 }
+  },
+  {
+    name: "French Fry",
+    rates: { regular: 120 }
+  },
+  {
+    name: "Egg Fried Rice",
+    rates: { regular: 100 }
+  },
+  {
+    name: "Chicken Fried Rice",
+    rates: { regular: 120 }
+  },
+  {
+    name: "Veg Fried Rice",
+    rates: { regular: 80 }
+  },
+  {
+    name: "Egg Chicken Fried Rice",
+    rates: { regular: 140 }
+  },
+  {
+    name: "Basanti Polao",
+    rates: { regular: 80 }
+  },
+  {
+    name: "Steamed Rice",
+    rates: { regular: 70, plain: 50 }
+  },
+  {
+    name: "Chilly Chicken",
+    types: ["Chilly Chicken Half", "Chilly Chicken Full"],
+    rates: {
+      "Chilly Chicken Half": { regular: 100 },
+      "Chilly Chicken Full": { regular: 180 }
     }
+  },
+  {
+    name: "Chicken Kasha",
+    types: ["2pc", "4pc"],
+    rates: {
+      "2pc": { regular: 70 },
+      "4pc": { regular: 130 }
+    }
+  },
+  {
+    name: "Mutton Kasha",
+    types: ["2pc", "4pc"],
+    rates: {
+      "2pc": { regular: 160 },
+      "4pc": { regular: 300 }
+    }
+  },
+  {
+    name: "Roti",
+    rates: { regular: 6 }
+  },
+  {
+    name: "Tawa Paratha",
+    rates: { regular: 12 }
+  },
+  {
+    name: "Green Salad",
+    rates: { regular: 50 }
+  },
+  {
+    name: "Onion Salad",
+    rates: { regular: 30 }
+  },
+  {
+    name: "Luchi",
+    rates: { regular: 8 }
+  },
+  {
+    name: "Peas Pulao",
+    rates: { regular: 80 }
+  },
+  {
+    name: "Jeera Rice",
+    rates: { regular: 80 }
+  },
+  {
+    name: "Veg Sandwich",
+    rates: { regular: 70 }
+  },
+  {
+    name: "Chicken Sandwich",
+    rates: { regular: 100 }
+  },
+  {
+    name: "Bread Omlette",
+    rates: { regular: 40 }
+  },
+  {
+    name: "Veg Maggi",
+    rates: { regular: 35 }
+  },
+  {
+    name: "Egg Maggi",
+    rates: { regular: 50 }
+  },
+  {
+    name: "Chicken Maggi",
+    rates: { regular: 70 }
+  },
+  {
+    name: "Egg/Chicken with Cheese Maggi",
+    rates: { regular: 90 }
+  }
+  // You can keep adding more based on PDF
+];
+let billItems = [];
+let selectedPopupItem = null;
+let selectedType = null;
+let selectedRateType = null;
+
+function openTypeAndRatePopup(item) {
+  selectedPopupItem = item;
+  selectedType = null;
+  selectedRateType = null;
+
+  document.getElementById("modalItemName").innerText = `Item: ${item.name}`;
+
+  const typeBox = document.getElementById("typeSelect");
+  const rateBox = document.getElementById("rateSelect");
+  const qtyInput = document.getElementById("popupQty");
+
+  typeBox.innerHTML = "";
+  rateBox.innerHTML = "";
+  qtyInput.value = 1;
+
+  // Populate type options if available
+  if (item.types && item.types.length) {
+    item.types.forEach(type => {
+      const option = document.createElement("option");
+      option.value = type;
+      option.innerText = type;
+      typeBox.appendChild(option);
+    });
+    typeBox.style.display = "block";
+  } else {
+    const option = document.createElement("option");
+    option.value = item.name;
+    option.innerText = item.name;
+    typeBox.appendChild(option);
+    typeBox.style.display = "none";
+  }
+
+  // Populate rate options
+  const sampleKey = item.types ? item.types[0] : item.name;
+  const availableRates = item.rates[sampleKey] || item.rates;
+
+  Object.keys(availableRates).forEach(rateType => {
+    const option = document.createElement("option");
+    option.value = rateType;
+    option.innerText = `${rateType} - ₹${availableRates[rateType]}`;
+    rateBox.appendChild(option);
   });
+
+  document.getElementById("typeRateModal").style.display = "block";
+}
+
+function closePopup() {
+  document.getElementById("typeRateModal").style.display = "none";
+  selectedPopupItem = null;
+}
+
+function confirmPopupSelection() {
+  const selectedType = document.getElementById("typeSelect").value;
+  const selectedRateType = document.getElementById("rateSelect").value;
+  const qty = parseInt(document.getElementById("popupQty").value) || 1;
+
+  if (!selectedType || !selectedRateType || !qty) {
+    alert("Please select type, rate, and quantity.");
+    return;
+  }
+
+  const price = selectedPopupItem.rates[selectedType]
+    ? selectedPopupItem.rates[selectedType][selectedRateType]
+    : selectedPopupItem.rates[selectedRateType];
+
+  if (!price) {
+    alert("Invalid rate selected.");
+    return;
+  }
+
+  billItems.push({ name: selectedType, qty, rate: price });
+  renderBill();
+  closePopup();
+}
+function filterMenu() {
+  const searchTerm = document.getElementById("menuSearch").value.toLowerCase();
+  const resultsBox = document.getElementById("menuSuggestions");
+  resultsBox.innerHTML = "";
+
+  if (!searchTerm) {
+    resultsBox.style.display = "none";
+    return;
+  }
+
+  const matchedItems = menuItems.filter(item =>
+    item.name.toLowerCase().includes(searchTerm)
+  );
+
+  matchedItems.forEach(item => {
+    const div = document.createElement("div");
+    div.textContent = item.name;
+    div.onclick = () => {
+      resultsBox.style.display = "none";
+      openTypeAndRatePopup(item); // assuming this function exists
+    };
+    resultsBox.appendChild(div);
+  });
+
+  resultsBox.style.display = matchedItems.length ? "block" : "none";
 }
 
 function addItem() {
-  const item = document.getElementById("menuSelect").value;
-  const qty = parseInt(document.getElementById("qty").value);
-  if (!item || !qty) return alert("Select item and quantity");
-  billItems.push({ name: item, qty, rate: menu[item] });
+  if (!window.preparedItem) {
+    return alert("Please select item and confirm type/rate first.");
+  }
+
+  const qty = parseInt(document.getElementById("qty").value) || 1;
+  billItems.push({ name: window.preparedItem.name, qty, rate: window.preparedItem.rate });
+
+  window.preparedItem = null; // Reset
   renderBill();
 }
 
@@ -466,12 +661,12 @@ function renderBill() {
     const total = qtySafe * rateSafe;
     subtotal += total;
 
-    // Editable version
+    // Editable bill table
     tbody.innerHTML += `
       <tr>
         <td>${name}</td>
         <td>
-          <input type="number" value="${qtySafe}" min="1" style="width: 50px;" 
+          <input type="number" value="${qtySafe}" min="1" style="width: 50px;"
                  onchange="updateItemQty(${index}, this.value)" />
         </td>
         <td>${rateSafe}</td>
@@ -480,7 +675,7 @@ function renderBill() {
       </tr>
     `;
 
-    // Print version
+    // Print-only version
     if (printBody) {
       printBody.innerHTML += `
         <tr>
@@ -497,22 +692,26 @@ function renderBill() {
   const taxAmt = subtotal * tax / 100;
   const total = subtotal + taxAmt;
 
-  document.getElementById("subtotal").innerText = subtotal.toFixed(2);
-  document.getElementById("taxAmount").innerText = taxAmt.toFixed(2);
-  document.getElementById("grandTotal").innerText = total.toFixed(2);
-
-const now = new Date();
-const billDateTime = now.toLocaleString();
-document.getElementById("printBillTime").innerText = billDateTime;
-
-  if (printBody) {
-    const printSubtotal = document.getElementById("printSubtotal");
-    const printTax = document.getElementById("printTax");
-    const printTotal = document.getElementById("printTotal");
-    if (printSubtotal) printSubtotal.innerText = subtotal.toFixed(2);
-    if (printTax) printTax.innerText = taxAmt.toFixed(2);
-    if (printTotal) printTotal.innerText = total.toFixed(2);
+  // Monospaced aligned totals
+  function formatLine(label, value) {
+    const labelPad = label.padEnd(10, ' ');
+    const valueStr = `₹${value.toFixed(2).padStart(7, ' ')}`;
+    return `${labelPad}: ${valueStr}`;
   }
+
+  document.getElementById("totalsBox").innerText =
+    formatLine("Subtotal", subtotal) + "\n" +
+    formatLine("Tax", taxAmt) + "\n" +
+    formatLine("Total", total);
+
+  // Optional: populate hidden print totals if needed
+  const printSubtotal = document.getElementById("printSubtotal");
+  const printTax = document.getElementById("printTax");
+  const printTotal = document.getElementById("printTotal");
+
+  if (printSubtotal) printSubtotal.innerText = subtotal.toFixed(2);
+  if (printTax) printTax.innerText = taxAmt.toFixed(2);
+  if (printTotal) printTotal.innerText = total.toFixed(2);
 }
 
 function updateItemQty(index, newQty) {
@@ -528,33 +727,89 @@ function removeItem(index) {
     renderBill();
   }
 }
-  function generateBill() {
+function generateBill() {
   const name = document.getElementById("customerName").value.trim();
   const mobile = document.getElementById("customerMobile").value.trim();
-  const tableNo = document.getElementById("tableNumber").value;
+  const tableNo = document.getElementById("tableNumber").value.trim();
+  const taxRate = parseFloat(document.getElementById("tax").value) || 0;
 
-  if (!name || !mobile) return alert("Customer info required");
-  if (!tableNo) return alert("Please enter a Table Number");
+  if (!name || !mobile) {
+    alert("Customer name and mobile are required.");
+    return;
+  }
 
-  // ✅ Save customer to Firebase
-  const customerKey = mobile;
-  db.ref("customers/" + customerKey).set({ name, mobile });
+  if (!tableNo) {
+    alert("Table number is required.");
+    return;
+  }
 
-  document.getElementById("customerDisplay").innerText = name + " | " + mobile;
-  document.getElementById("printTableNumber").innerText = tableNo;
+  // Get new Bill No via Firebase transaction
+  db.ref("lastBillNo").transaction(current => (current || 1000) + 1)
+    .then(res => {
+      const billNo = "PB/25-26/" + res.snapshot.val();
+      const createdAt = new Date().toISOString();
 
-db.ref("lastBillNo").transaction(curr => (curr || 1000) + 1).then(res => {
-  const billNo = res.snapshot.val();
-  document.getElementById("billNumber").innerText = billNo;
-  saveAndStoreBill(billNo, name, mobile, tableNo); // ✅ pass tableNo
-}).catch(() => {
-  const localBill = parseInt(localStorage.getItem("lastBill") || "1000") + 1;
-  localStorage.setItem("lastBill", localBill);
-  document.getElementById("billNumber").innerText = localBill;
-  saveAndStoreBill(localBill, name, mobile, tableNo); // ✅ pass tableNo
-});
+      // Save customer
+      db.ref("customers/" + mobile).set({ name, mobile });
+
+      // Display info (safe element access)
+      const billNumberEl = document.getElementById("billNumber");
+      if (billNumberEl) billNumberEl.innerText = billNo;
+
+      const customerDisplayEl = document.getElementById("customerDisplay");
+      if (customerDisplayEl) customerDisplayEl.innerText = `${name} | ${mobile}`;
+
+      const tableEl = document.getElementById("printTableNumber");
+      if (tableEl) tableEl.innerText = tableNo;
+
+      const dateEl = document.getElementById("printBillTime");
+      if (dateEl) dateEl.innerText = new Date().toLocaleString();
+
+      // Calculate totals
+      let subtotal = 0;
+      const items = billItems.map(item => {
+        const lineTotal = item.qty * item.rate;
+        subtotal += lineTotal;
+        return `${item.name} (x${item.qty}) = ₹${lineTotal.toFixed(2)}`;
+      });
+
+      const taxAmount = subtotal * (taxRate / 100);
+      const total = subtotal + taxAmount;
+
+      const subtotalEl = document.getElementById("subtotal");
+      if (subtotalEl) subtotalEl.innerText = subtotal.toFixed(2);
+
+      const taxEl = document.getElementById("taxAmount");
+      if (taxEl) taxEl.innerText = taxAmount.toFixed(2);
+
+      const totalEl = document.getElementById("grandTotal");
+      if (totalEl) totalEl.innerText = total.toFixed(2);
+
+      // Save bill
+      const billData = {
+        billNo,
+        name,
+        mobile,
+        tableNo,
+        items,
+        subtotal: parseFloat(subtotal.toFixed(2)),
+        tax: parseFloat(taxAmount.toFixed(2)),
+        total: parseFloat(total.toFixed(2)),
+        createdAt,
+        paymentMode: "Unpaid"
+      };
+
+      const billRef = db.ref("bills").push();
+      billRef.set(billData);
+
+      // Generate KOT
+      generateKOT(billNo, items, tableNo);
+    })
+    .catch(error => {
+      console.error("Failed to generate bill number:", error);
+      alert("❌ Error generating bill number. Please try again.");
+    });
 }
-
 function saveAndStoreBill(billNo, name, mobile, tableNo) {
   const tax = parseFloat(document.getElementById("tax").value) || 0;
   let subtotal = 0;
@@ -570,23 +825,18 @@ function saveAndStoreBill(billNo, name, mobile, tableNo) {
   const taxAmt = subtotal * tax / 100;
   const grandTotal = subtotal + taxAmt;
 
-  const now = new Date();
-const billDateTime = now.toLocaleString(); // Save readable datetime
-
-const bill = {
-  billNo,
-  date: now.toISOString(),         // ISO for backend usage
-  readableDate: billDateTime,      // readable version for display
-  name,
-  mobile,
-  tableNo,
-  items,
-  subtotal,
-  tax: taxAmt,
-  total: grandTotal,
-  paymentMode: "Unpaid"
-};
-
+  const bill = {
+    billNo,
+    date: new Date().toISOString(),
+    name,
+    mobile,
+    tableNo,
+    items,
+    subtotal,
+    tax: taxAmt,
+    total: grandTotal,
+    paymentMode: "Unpaid"
+  };
 
   const history = JSON.parse(localStorage.getItem("billHistory") || "[]");
   history.push(bill);
@@ -597,33 +847,34 @@ const bill = {
   showSettlementTab(); 
 }
 
-function generateKOT(billNo, items, tableNo){
-  const kotId = "KOT" + Date.now();
+function generateKOT(billNo, items, tableNo) {
   db.ref("lastKOTNo").transaction(curr => (curr || 2000) + 1).then(res => {
     const kotNo = res.snapshot.val();
+
     const kot = {
-      kotId,
       kotNo,
       billNo,
       tableNo,
       items,
       createdAt: new Date().toISOString()
     };
-    db.ref("kots").push(kot);
 
+    db.ref("kots").push(kot);
+    document.getElementById("kotNumberDisplay").innerText = kotNo;
+
+    // Build KOT print content
     const itemLines = items.map(i => {
       const match = i.match(/^(.*?) \(x(\d+)\)/);
       return match ? `• ${match[1]}  x${match[2]}` : `• ${i}`;
     });
 
-    const kotText = `
+    const kotHTML = `
       <div style="width: 203px; font-size: 10px; font-family: monospace;">
-      <h3 style="text-align:center;">Panchabyanjan Restaurant and Caterer</h3>
+        <h3 style="text-align:center;">Panchabyanjan Restaurant and Caterer</h3>
         <h3 style="text-align:center;">KOT</h3>
         <p>KOT No: ${kotNo}</p>
         <p>Bill No: ${billNo}</p>
         <p>Table No: ${tableNo}</p>
-        <p>Date: ${new Date().toLocaleString()}</p>
         <hr />
         <pre>${itemLines.join("\n")}</pre>
         <hr />
@@ -632,124 +883,108 @@ function generateKOT(billNo, items, tableNo){
     `;
 
     const win = window.open("", "_blank");
-    win.document.write(kotText);
+    win.document.write(kotHTML);
     win.document.close();
     win.focus();
     win.print();
   });
 }
-function generateUpdatedKOT(billNo, items) {
+function generateUpdatedKOT(billNo, items, tableNo) {
+  if (!tableNo) {
+    alert("Table number is required to update KOT.");
+    return;
+  }
+
   const kotId = "KOT" + Date.now();
 
-  // Step 1: Find and delete existing KOTs for this bill
-  db.ref("kots").once("value", snap => {
-    const allKOTs = snap.val() || {};
-    const deleteOps = {};
+  db.ref("lastKOTNo").transaction(current => (current || 2000) + 1).then(res => {
+    const kotNo = res.snapshot.val();
 
-    Object.entries(allKOTs).forEach(([key, kot]) => {
-      if (kot.billNo === billNo) {
-        deleteOps[`kots/${key}`] = null; // Mark for deletion
-      }
+    const kot = {
+      kotId,
+      kotNo,
+      tableNo,
+      billNo,
+      items,
+      createdAt: new Date().toISOString(),
+      updated: true
+    };
+
+    db.ref("kots").push(kot);
+    document.getElementById("kotNumberDisplay").innerText = kotNo;
+
+    const itemLines = items.map(i => {
+      const match = i.match(/^(.*?) \(x(\d+)\)/);
+      return match ? `• ${match[1]}  x${match[2]}` : `• ${i}`;
     });
 
-    db.ref().update(deleteOps, err => {
-      if (err) {
-        console.error("❌ Failed to delete old KOTs:", err);
-        return alert("Could not remove previous KOTs.");
-      }
+    const kotHTML = `
+      <div style="width: 203px; font-size: 10px; font-family: monospace;">
+        <h3 style="text-align:center;">Panchabyanjan Restaurant and Caterer</h3>
+        <h3 style="text-align:center;">UPDATED KOT</h3>
+        <p>KOT No: ${kotNo}</p>
+        <p>Bill No: ${billNo}</p>
+        <p>Table No: ${tableNo}</p>
+        <hr />
+        <pre>${itemLines.join("\n")}</pre>
+        <hr />
+        <p style="text-align:center;">Updated Kitchen Copy</p>
+      </div>
+    `;
 
-      // Step 2: Fetch latest KOT number and create new one
-      db.ref("lastKOTNo").transaction(curr => (curr || 2000) + 1).then(res => {
-        const kotNo = res.snapshot.val();
-
-        // ✅ Fetch table number again for accuracy
-        const tableNo = document.getElementById("tableNumber").value || "N/A";
-
-        const kot = {
-          kotId,
-          kotNo,
-          billNo,
-          tableNo,
-          items,
-          createdAt: new Date().toISOString(),
-          updated: true
-        };
-
-        db.ref("kots").push(kot);
-
-        // Format item lines
-        const itemLines = items.map(i => {
-          const match = i.match(/^(.*?) \(x(\d+)\)/);
-          return match ? `• ${match[1]}  x${match[2]}` : `• ${i}`;
-        });
-
-        // Generate printable KOT
-        const kotText = `
-          <div style="width: 203px; font-size: 10px; font-family: monospace;">
-            <h3 style="text-align:center;">Panchabyanjan Restaurant and Caterer</h3>
-            <h3 style="text-align:center;">UPDATE OF BILL NO: ${billNo}</h3>
-            <p>KOT No: ${kotNo}</p>
-            <p>Table No: ${tableNo}</p>
-            <p>Date: ${new Date().toLocaleString()}</p>
-            <hr />
-            <pre>${itemLines.join("\n")}</pre>
-            <hr />
-            <p style="text-align:center;">Updated Kitchen Copy</p>
-          </div>
-        `;
-
-        const win = window.open("", "_blank");
-        win.document.write(kotText);
-        win.document.close();
-        win.focus();
-        win.print();
-      });
-    });
+    const win = window.open("", "_blank");
+    win.document.write(kotHTML);
+    win.document.close();
+    win.focus();
+    win.print();
+  }).catch(err => {
+    console.error("Failed to update KOT:", err);
+    alert("Error updating KOT. Please try again.");
   });
 }
-
 function printAndReset() {
-  // ✅ Step 1: Fill all calculated print fields before printing
-  const name = document.getElementById("customerName").value.trim();
-  const mobile = document.getElementById("customerMobile").value.trim();
-  const tableNo = document.getElementById("tableNumber").value.trim();
-  const taxPercent = parseFloat(document.getElementById("tax").value) || 0;
-
-  const subtotal = billItems.reduce((sum, i) => sum + (i.qty * i.rate), 0);
-  const taxAmount = subtotal * taxPercent / 100;
-  const grandTotal = subtotal + taxAmount;
-
-  // ✅ Update bill print fields
-  document.getElementById("customerDisplay").innerText = `${name} | ${mobile}`;
-  document.getElementById("printTableNo").innerText = tableNo;
-  document.getElementById("subtotal").innerText = subtotal.toFixed(2);
-  document.getElementById("taxAmount").innerText = taxAmount.toFixed(2);
-  document.getElementById("grandTotal").innerText = grandTotal.toFixed(2);
-  document.getElementById("printBillTime").innerText = new Date().toLocaleString();
-
-  // ✅ Step 2: Now print
   window.onafterprint = () => {
     billItems.length = 0;
-    document.getElementById("customerName").value = "";
-    document.getElementById("customerMobile").value = "";
-    document.getElementById("tableNumber").value = "";
-    document.getElementById("tax").value = "";
-    document.getElementById("menuSearch").value = "";
-    document.getElementById("qty").value = 1;
-    document.getElementById("billNumber").innerText = "---";
-    document.getElementById("customerDisplay").innerText = "";
-    document.querySelector("#billTable tbody").innerHTML = "";
-    document.getElementById("subtotal").innerText = "0";
-    document.getElementById("taxAmount").innerText = "0";
-    document.getElementById("grandTotal").innerText = "0";
-    filterMenu();
-    populateReprintDropdown();
-    document.getElementById("customerName").focus(); // optional
+
+    const resetValue = id => {
+      const el = document.getElementById(id);
+      if (el) el.value = "";
+    };
+
+    const resetText = id => {
+      const el = document.getElementById(id);
+      if (el) el.innerText = "---";
+    };
+
+    resetValue("customerName");
+    resetValue("customerMobile");
+    resetValue("tax");
+    resetValue("menuSearch");
+    resetValue("qty");
+
+    resetText("billNumber");
+    resetText("customerDisplay");
+    resetText("printTableNumber");
+    resetText("printBillTime");
+
+    const totalsBox = document.getElementById("totalsBox");
+    if (totalsBox) totalsBox.innerText = "";
+
+    const tbody = document.querySelector("#billTable tbody");
+    if (tbody) tbody.innerHTML = "";
+
+    const printBody = document.getElementById("printTableBody");
+    if (printBody) printBody.innerHTML = "";
+
+    if (typeof filterMenu === "function") filterMenu();
+    if (typeof populateReprintDropdown === "function") populateReprintDropdown();
+
+    const nameInput = document.getElementById("customerName");
+    if (nameInput) nameInput.focus();
   };
 
-  window.print();  // ✅ after setting values
+  window.print();
 }
-
 function populateReprintDropdown() {
   db.ref("bills").once("value", snap => {
     const all = snap.val();
@@ -803,22 +1038,30 @@ function formatDateLocal(isoStr) {
   });
 }
 window.onload = function () {
-  filterMenu();
+  document.getElementById("menuSearch").addEventListener("input", filterMenu);
   populateReprintDropdown();
+  showSettlementTab(); // 🔁 Add this here
 };
 function saveEditedBill() {
   if (!editingBillKey) return alert("No bill in edit mode.");
 
-  const name = document.getElementById("customerName").value;
-  const mobile = document.getElementById("customerMobile").value;
-  const billNo = document.getElementById("billNumber").innerText;
+  const name = document.getElementById("customerName").value.trim();
+  const mobile = document.getElementById("customerMobile").value.trim();
+  const tableNo = document.getElementById("tableNumber").value.trim();  // ✅ Fixed
+  const billNo = document.getElementById("billNumber").innerText.trim();
   const tax = parseFloat(document.getElementById("tax").value) || 0;
 
+  if (!name || !mobile || !tableNo) {
+    alert("Please fill in Customer Name, Mobile, and Table Number.");
+    return;
+  }
+
+  // Recalculate totals
   let subtotal = 0;
   const items = billItems.map(i => {
     const total = i.qty * i.rate;
     subtotal += total;
-    return `${i.name} (x${i.qty}) = ₹${total}`;
+    return `${i.name} (x${i.qty}) = ₹${total.toFixed(2)}`;
   });
 
   const taxAmt = subtotal * tax / 100;
@@ -826,38 +1069,53 @@ function saveEditedBill() {
 
   const bill = {
     billNo,
-    date: new Date().toISOString(),
     name,
     mobile,
+    tableNo,  // ✅ Make sure it's saved
     items,
-    subtotal,
-    tax: taxAmt,
-    total,
-    paymentMode: "Unpaid"
+    subtotal: parseFloat(subtotal.toFixed(2)),
+    tax: parseFloat(taxAmt.toFixed(2)),
+    total: parseFloat(total.toFixed(2)),
+    paymentMode: "Unpaid",
+    updatedAt: new Date().toISOString()
   };
 
-  db.ref("bills/" + editingBillKey).set(bill, err => {
+  db.ref("bills/" + editingBillKey).set(bill, (err) => {
     if (err) {
-      alert("Failed to save changes.");
+      alert("❌ Failed to save changes.");
     } else {
-      alert("Bill updated successfully.");
+      alert("✅ Bill updated successfully.");
       document.getElementById("saveEditBtn").style.display = "none";
       editingBillKey = null;
 
-      generateUpdatedKOT(billNo, items); // 🔥 Trigger new KOT slip
+      // ✅ Generate UPDATED KOT (replaces old one)
+      generateUpdatedKOT(billNo, items, tableNo);
     }
   });
+
+  // 🔁 Optional: Update or create customer record
+  const customerKey = mobile;
+  const customerObj = {
+    name: name,
+    mobile: mobile,
+    lastVisited: new Date().toISOString()
+  };
+
+  db.ref("customers/" + customerKey).set(customerObj);
 }
 
 </script>
 <script>
 // ==== SETTLEMENT ====
 function showSettlementTab() {
-  document.getElementById("settlementSection").style.display = "block";
+  const section = document.getElementById("settlementSection");
+  if (section) section.style.display = "block";
 
   db.ref("bills").once("value", snapshot => {
     const allBills = snapshot.val();
     const select = document.getElementById("billSelect");
+    if (!select) return;
+
     select.innerHTML = "<option value=''>Select Bill</option>";
 
     Object.entries(allBills || {}).forEach(([key, bill]) => {
@@ -893,46 +1151,22 @@ function downloadCSV(data, filename) {
 }
 
 function downloadHistoryByDateRangeCSV() {
-  const role = sessionStorage.getItem("role");
-  if (role === "staff") {
-    alert("Access denied");
-    return;
-  }
-
+const role = sessionStorage.getItem("role");
+if (role === "staff") {
+  alert("Access denied");
+  return;
+}
   const from = prompt("From date (YYYY-MM-DD)");
   const to = prompt("To date (YYYY-MM-DD)");
-
-  Promise.all([
-    db.ref("bills").once("value"),
-    db.ref("kots").once("value")
-  ]).then(([billSnap, kotSnap]) => {
-    const bills = billSnap.val() || {};
-    const kots = kotSnap.val() || {};
-
-    // Group KOTs by billNo
-    const kotMap = {};
-    Object.values(kots).forEach(k => {
-      if (!kotMap[k.billNo]) kotMap[k.billNo] = [];
-      kotMap[k.billNo].push(k.updated ? `UPDATED #${k.kotNo}` : `#${k.kotNo}`);
-    });
-
-    const rows = [["Bill No", "Date", "Time", "Customer", "Mobile", "Total", "KOTs"]];
-
-    Object.values(bills).forEach(b => {
+  db.ref("bills").once("value", snap => {
+    const all = snap.val();
+    const rows = [["Bill No", "Date", "Time","Customer", "Mobile", "Total"]];
+    Object.values(all || {}).forEach(b => {
       const d = b.date?.split("T")[0];
       if (d >= from && d <= to) {
-        const kotList = kotMap[b.billNo] ? kotMap[b.billNo].join(" | ") : "—";
-        rows.push([
-          b.billNo,
-          formatDateLocal(b.date),
-          b.name,
-          b.mobile,
-          b.total,
-          kotList
-        ]);
+        rows.push([b.billNo, formatDateLocal(b.date), b.name, b.mobile, b.total]);
       }
     });
-
     downloadCSV(rows, `bill_history_${from}_to_${to}.csv`);
   });
 }
@@ -1082,25 +1316,15 @@ function displayInViewer(rows, title) {
 function viewKOTLog() {
   const from = prompt("From date (YYYY-MM-DD)");
   const to = prompt("To date (YYYY-MM-DD)");
-
   db.ref("kots").once("value", snap => {
     const all = snap.val();
-    const rows = [["KOT No", "Bill No", "Table", "Items", "Created", "Type"]];
-
+    const rows = [["KOT No", "Bill No", "Items", "Created"]];
     Object.values(all || {}).forEach(k => {
       const d = k.createdAt?.split("T")[0];
       if (d >= from && d <= to) {
-        rows.push([
-          k.kotNo,
-          k.billNo,
-          k.tableNo || "N/A",
-          (k.items || []).join(" / "),
-          formatDateLocal(k.createdAt),
-          k.updated ? "UPDATE" : "NEW"
-        ]);
+        rows.push([k.kotNo, k.billNo, (k.items || []).join(" / "), k.createdAt]);
       }
     });
-
     const viewer = document.getElementById("kotLogViewer");
     viewer.innerHTML = `<h3>KOT Log</h3>`;
     const table = document.createElement("table");
@@ -1109,12 +1333,10 @@ function viewKOTLog() {
         `<${i === 0 ? "th" : "td"}>${col}</${i === 0 ? "th" : "td"}>`).join("")
       }</tr>`
     ).join("");
-
     viewer.appendChild(table);
     viewer.style.display = "block";
   });
 }
-
 
 // ==== ADMIN BILL/KOT MANAGERS ====
 function showManageBillsTab() {
@@ -1161,28 +1383,44 @@ function loadBillForEdit(key) {
     editingBillKey = key;
     document.getElementById("saveEditBtn").style.display = "block";
 
+    // Set customer info
     document.getElementById("customerName").value = bill.name || "";
     document.getElementById("customerMobile").value = bill.mobile || "";
-    document.getElementById("tax").value = ((bill.tax / bill.subtotal) * 100).toFixed(2) || 0;
+
+    // ✅ Table No fix
+    document.getElementById("tableNumber").value = bill.tableNo || "";
+
+    // ✅ Tax rate calculation (avoid NaN)
+    if (bill.subtotal && bill.tax) {
+      document.getElementById("tax").value = ((bill.tax / bill.subtotal) * 100).toFixed(2);
+    } else {
+      document.getElementById("tax").value = 0;
+    }
+
     document.getElementById("billNumber").innerText = bill.billNo || "---";
     document.getElementById("customerDisplay").innerText = `${bill.name} | ${bill.mobile}`;
 
+    // Clear and re-build bill items
     billItems.length = 0;
-
     let anyParsed = false;
+
     (bill.items || []).forEach(line => {
-      console.log("Parsing item line:", line);
       const match = line.match(/^(.*?) \(x(\d+)\) = ₹(\d+(?:\.\d+)?)/);
       if (match) {
         const name = match[1].trim();
         const qty = parseInt(match[2]);
-if (isNaN(qty) || qty < 1) return console.warn("Invalid qty:", match[2]);
-        const total = parseFloat(match[3]) || 0;
-        const rate = qty ? total / qty : 0;
-        billItems.push({ name, qty, rate });
+        const total = parseFloat(match[3]);
+
+        if (isNaN(qty) || qty <= 0 || isNaN(total)) {
+          console.warn("Invalid item line:", line);
+          return;
+        }
+
+        const rate = (total / qty).toFixed(2);
+        billItems.push({ name, qty, rate: parseFloat(rate) });
         anyParsed = true;
       } else {
-        console.warn("⚠️ Could not parse line:", line);
+        console.warn("⚠️ Could not parse item line:", line);
       }
     });
 
@@ -1359,49 +1597,5 @@ if (isNaN(qty) || qty < 1) return console.warn("Invalid qty:", match[2]);
     });
   });
 }
-// ✅ Hide suggestions when clicking outside
-document.addEventListener("click", function (e) {
-  const box = document.getElementById("customerSuggestions");
-  if (box && !box.contains(e.target) && e.target.id !== "customerMobile") {
-    box.style.display = "none";
-  }
-}); // ✅ Close the event listener properly
-
-// ✅ Suggestion function — OUTSIDE the event listener
-function showCustomerSuggestions() {
-  const input = document.getElementById("customerMobile");
-  const suggestionBox = document.getElementById("customerSuggestions");
-  const mobile = input.value.trim();
-
-  if (mobile.length < 3) {
-    suggestionBox.style.display = "none";
-    return;
-  }
-
-  firebase.database().ref("customers").orderByKey()
-    .startAt(mobile).endAt(mobile + "\uf8ff").once("value", snapshot => {
-      const customers = snapshot.val();
-      suggestionBox.innerHTML = "";
-
-      if (!customers) {
-        suggestionBox.style.display = "none";
-        return;
-      }
-
-      Object.values(customers).forEach(cust => {
-        const div = document.createElement("div");
-        div.textContent = `${cust.name} | ${cust.mobile}`;
-        div.onclick = () => {
-          document.getElementById("customerName").value = cust.name;
-          document.getElementById("customerMobile").value = cust.mobile;
-          suggestionBox.style.display = "none";
-        };
-        suggestionBox.appendChild(div);
-      });
-
-      suggestionBox.style.display = "block";
-    });
-}
-
 </script>
 </html>
